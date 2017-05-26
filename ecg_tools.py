@@ -1,34 +1,9 @@
+__author__ = 'ykhoma'
 import serial
 import struct
 import numpy as np
 from scipy import signal
 from biosppy.signals.ecg import hamilton_segmenter
-
-
-def serial_reader(serial_port, baud_rate, samples_num):
-    SYNC_START = b'\xAA\xAA\xAA\xAA'  # synchronizing combination
-    data = np.zeros([samples_num])
-    ser = serial.Serial(serial_port, baud_rate)
-    ser.flushInput()
-    ser.flushOutput()
-    sync = False
-    for i in range(0, samples_num):
-        if not sync:
-            serialdata = ''
-            while True:
-                temp = ser.read()
-                serialdata += temp
-                if serialdata[-4:] == SYNC_START:
-                    sync = True
-                    break
-        temp = ser.read(10)
-        if temp[-4:] != SYNC_START:
-            sync = False
-            continue
-        data[i] = struct.unpack("<H", temp[2:4])[0]
-
-    ser.close()
-    return data
 
 
 def preprocessing(data):
